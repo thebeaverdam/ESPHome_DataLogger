@@ -1,0 +1,88 @@
+esphome:
+  name: data-logger
+  friendly_name: data logger
+
+
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+
+i2c:
+  sda: GPIO19
+  scl: GPIO18
+  scan: true
+
+# ------------------------
+# Componente SD_MMC
+# ------------------------
+external_components:
+  - source: github://n-serrette/esphome_sd_card
+
+sd_mmc_card:
+  id: sd_card
+  mode_1bit: true     # modo de 1 bit (más simple, más estable)
+  clk_pin: GPIO14     # reloj (único válido en WROOM)
+  cmd_pin: GPIO15     # comando / CS
+  data0_pin: GPIO2    # línea de datos 0
+
+# ------------------------
+# Sensor INA226
+# ------------------------
+sensor:
+  - platform: ina226
+    address: 0x40
+    shunt_resistance: 0.01 ohm
+    current:
+      name: "Corriente"
+      id: corriente
+    power:
+      name: "Potencia"
+      id: potencia
+    bus_voltage:
+      name: "Voltaje"
+      id: voltaje
+      filters:
+        - multiply: 0.9514
+    shunt_voltage:
+      name: "Voltaje Shunt"
+    update_interval: 2s
+
+  - platform: integration
+    name: "Energía consumida"
+    sensor: potencia
+    time_unit: h
+    id: energia_consumida
+
+# ------------------------
+# Pantalla OLED SSD1306
+# ------------------------
+display:
+  - platform: ssd1306_i2c
+    model: "SSD1306 128x64"
+    address: 0x3D
+    lambda: |-
+      it.printf(0, 0, id(font1), "V: %.2f V", id(voltaje).state);
+      it.printf(0, 16, id(font1), "I: %.2f A", id(corriente).state);
+      
+
+font:
+  - file: "fonts/arial_narrow_7.ttf"
+    id: font1
+    size: 14
+
+# ------------------------
+# Reloj NTP
+# ------------------------
+
+
+# ------------------------
+# Botón de registro
+# ------------------------
+
+
+# ------------------------
+# Logger
+# ------------------------
+logger:
+  level: DEBUG
