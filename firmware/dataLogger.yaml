@@ -9,22 +9,14 @@ esp32:
     type: esp-idf
 
 i2c:
-  sda: GPIO19
-  scl: GPIO18
+  sda: GPIO21
+  scl: GPIO22
   scan: true
 
 # ------------------------
 # Componente SD_MMC
 # ------------------------
-external_components:
-  - source: github://n-serrette/esphome_sd_card
 
-sd_mmc_card:
-  id: sd_card
-  mode_1bit: true     # modo de 1 bit (más simple, más estable)
-  clk_pin: GPIO14     # reloj (único válido en WROOM)
-  cmd_pin: GPIO15     # comando / CS
-  data0_pin: GPIO2    # línea de datos 0
 
 # ------------------------
 # Sensor INA226
@@ -60,7 +52,7 @@ sensor:
 display:
   - platform: ssd1306_i2c
     model: "SSD1306 128x64"
-    address: 0x3D
+    address: 0x3C
     lambda: |-
       it.printf(0, 0, id(font1), "V: %.2f V", id(voltaje).state);
       it.printf(0, 16, id(font1), "I: %.2f A", id(corriente).state);
